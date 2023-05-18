@@ -1,47 +1,63 @@
 import argparse
 import json
 import zipfile
+from typing import List, Dict, Any
 from utils import filter_operations_by_status, sort_operations_by_date, print_operations
 
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('zip_path', type=str, help='path to the zip file')
-args = parser.parse_args()
 
-try:
-    with zipfile.ZipFile(args.zip_path, 'r') as zip_ref:
-        if 'operations.json' not in zip_ref.namelist():
-            print('File not found in archive')
-            exit()
-        zip_ref.extract('operations.json')
-except FileNotFoundError:
-    print('File not found')
-    exit()
+def extract_operations(zip_path: str) -> List[Dict[str, Any]]:
+    """
+    Извлекает список операций из архива.
 
-try:
-    with open('operations.json', 'r', encoding='utf-8') as f:
-        data = json.load(f)
-except FileNotFoundError:
-    print('File not found')
-    exit()
-except json.JSONDecodeError:
-    print('Invalid json format')
-    exit()
+    :param zip_path: Путь к архиву с файлом 'operations.json'.
+    :return: Список словарей с данными об операциях.
+             Каждый словарь должен содержать ключ 'status' с значением статуса операции.
+    """
+    try:
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            if 'operations.json' not in zip_ref.namelist():
+                print('File not found in archive')
+                exit()
+            zip_ref.extract('operations.json')
+    except FileNotFoundError:
+        print('File not found')
+        exit()
 
-try:
-    executed_operations = filter_operations_by_status(data, 'EXECUTED')
-except KeyError:
-    print('Invalid data format')
-    exit()
+    try:
+        with open('operations.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        print('File not found')
+        exit()
+    except json.JSONDecodeError:
+        print('Invalid json format')
+        exit()
 
-try:
-    sorted_operations = sort_operations_by_date(executed_operations)
-except ValueError:
-    print('Invalid date format')
-    exit()
+    return data
 
-try:
-    print_operations(sorted_operations)
-except TypeError:
-    print('Invalid data format')
-    exit()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('zip_path', type=str, help='path to the zip file')
+    args = parser.parse_args()
+
+    data = extract_operations(args.zip_path)
+
+    try:
+        executed_operations = filter_operations_by_status(data, 'EXECUTED')
+    except KeyError:
+        print('Invalid data format')
+        exit()
+
+    try:
+        sorted_operations = sort_operations_by_date(executed_operations)
+    except ValueError:
+        print('Invalid date format')
+        exit()
+
+    try:
+        print_operations(sorted_operations)
+    except TypeError:
+        print('Invalid data format')
+        exit()
 

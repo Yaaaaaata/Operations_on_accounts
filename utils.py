@@ -3,6 +3,9 @@ import re
 
 
 def filter_operations_by_status(data, status):
+    """
+    Фильтрует список операций по заданному статусу.
+    """
     if isinstance(data, list):
         operations = data
         filtered_operations = [op for op in operations if op.get('state') == status]
@@ -17,6 +20,9 @@ def filter_operations_by_status(data, status):
 
 
 def sort_operations_by_date(operations, reverse=True):
+    """
+    Сортирует список операций по дате.
+    """
     sorted_operations = sorted(operations, key=lambda op: op['date'], reverse=reverse)
     return sorted_operations
 
@@ -33,17 +39,17 @@ def mask_card_number(card_number):
     if not card_number:
         return ''
 
-    # Удаляем все символы, кроме цифр
+    """Удаляем все символы, кроме цифр"""
     card_number = re.sub(r'\D', '', card_number)
 
-    # Если длина номера карты больше 16 символов, оставляем только последние 4 цифры
+    """Если длина номера карты больше 16 символов, оставляем только последние 4 цифры"""
     if len(card_number) > 16:
         card_number = '**{}'.format(card_number[-4:])
     else:
-        # Добавляем пробелы между группами цифр
+        """Добавляем пробелы между группами цифр"""
         card_number = ' '.join([card_number[i:i+4] for i in range(0, len(card_number), 4)])
 
-    # Маскируем две последние группы цифр
+    """Маскируем две последние группы цифр"""
     if len(card_number) == 19:
         card_number = '{}** **** {}'.format(card_number[:7], card_number[-4:])
     elif len(card_number) == 16:
@@ -53,9 +59,15 @@ def mask_card_number(card_number):
 
 
 def print_operations(operations):
+    """
+       Печатает отсортированный список операций.
+
+       :param operations: Список словарей с данными об операциях.
+       :type operations: list[dict[str, any]]
+       """
     executed_operations = [op for op in operations if op.get('state') == 'EXECUTED']
     sorted_operations = sorted(executed_operations, key=lambda op: op['date'], reverse=True)
-    for op in sorted_operations[:5]:
+    for op in sorted_operations[:7]:
         date = datetime.datetime.strptime(op.get('date'), '%Y-%m-%dT%H:%M:%S.%f').strftime('%d.%m.%Y')
         description = op.get('description')
         from_ = op.get('from')
@@ -84,7 +96,7 @@ def print_operations(operations):
                 masked_to = '**** ' + to[-4:]
             else:
                 masked_to = '**' + to[-4:]
-            # Оставляем пробел между 4 цифрами
+            """Оставляем пробел между 4 цифрами"""
             masked_from = re.sub(r'(\d{4})\s(\d{2})\*\*\s', r'\1\2** ', masked_from)
             print(f"{date} {description}\n{masked_from}-> Счет {masked_to} \n{amount} {currency}\n")
 
