@@ -74,7 +74,11 @@ def print_operations(operations):
         to = op.get('to')
         amount = op.get('operationAmount', {}).get('amount')
         currency = op.get('operationAmount', {}).get('currency', {}).get('name')
-        card_type = op.get('cardType', '').lower()
+        card_type = op.get('cardType')
+        if card_type is not None:
+            card_type = card_type.lower()
+        else:
+            card_type = ''
         if all([date, description, from_, to, amount, currency]):
             from_words = re.findall(r'[^\W\d_]+|\d+', from_)
             masked_from = ''
