@@ -109,3 +109,4 @@ if __name__ == '__main__':
     card_numbers = ['1234567812345670', '1234 5678 1234 5678', '1234-5678-1234-5678', '1234.5678.1234.5678']
     for card_number in card_numbers:
         print(mask_card_number(card_number))
+

@@ -94,3 +94,4 @@ def test_print_operations(operations, capsys):
         "02.01.2022 Transfer\n9876 5 4** **** 7654 -> Счет **** 5678 \n2000 EUR\n\n"
         "01.01.2022 Payment\n1234 5 6** **** 5678 -> Счет **** 7654 \n1000 USD\n\n"
     )
+
